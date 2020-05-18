@@ -1,0 +1,315 @@
+var connection,
+  wind,
+  compass,
+  boost,
+  indicator,
+  connInfo,
+  info,
+  portOffsetX = -1,
+  starOffset = -1,
+  lastVal = 0;
+var Analog0 = new Array(); // create the arrays for the analog readings here.
+
+document.getElementById("port").addEventListener("click", function (e) {
+  portOffsetX = lastVal;
+  console.log("port offset = " + portOffsetX);
+});
+
+document.getElementById("star").addEventListener("click", function (e) {
+  starOffset = lastVal;
+  console.log("star offset = " + starOffset);
+});
+window.addEventListener("resize", function () {
+  console.log("resized");
+  wind.update();
+  boost.update();
+});
+
+indicator = document.getElementById("indicator");
+connInfo = document.getElementById("connInfo");
+info = document.getElementById("info");
+
+function to360(value) {
+  if (value < 0) {
+    return value + 360;
+  }
+  if (value > 360) {
+    return value - 360;
+  }
+  return value;
+}
+
+function getHighlights() {
+  var offsetPoints = [100, 30, 25, 20, 15, 10];
+  var offsetsX = offsetPoints.map(function (point, index) {
+    var portFromx = to360(portOffsetX - point);
+
+    return {
+      to: portOffsetX,
+      from: portFromx,
+      color: `rgb(${100 + point}, ${255 - point}, 87)`,
+    };
+  });
+  var offsetsY = offsetPoints.map(function (point, index) {
+    var starTo = to360(starOffset + point);
+
+    return {
+      to: starTo,
+      from: starOffset,
+      color: `rgb(${100 + point}, ${255 - point}, 87)`,
+    };
+  });
+  var idealPort = {
+    to: to360(portOffsetX + 5),
+    from: to360(portOffsetX - 5),
+    color: "rgb(0, 255, 0)",
+  };
+  var redPort = {
+    to: to360(portOffsetX + 22),
+    from: to360(portOffsetX + 5),
+    color: "rgb(255, 0, 0)",
+  };
+  var idealStar = {
+    from: to360(starOffset - 5),
+    to: to360(starOffset + 5),
+    color: "rgb(0, 255, 0)",
+  };
+  var redStar = {
+    from: to360(starOffset - 22),
+    to: to360(starOffset - 5),
+    color: "rgb(255, 0, 0)",
+  };
+  var offsets = [
+    ...offsetsX,
+    idealPort,
+    redPort,
+    ...offsetsY,
+    // { from: portOffsetX, to: portOffsetX, color: "rgb(21, 255, 0)" },
+    idealStar,
+    redStar,
+  ];
+  console.log("blaw", offsets, idealPort, redPort, idealStar, redStar);
+  return offsets;
+}
+document.addEventListener("DOMContentLoaded", function (event) {
+  console.log("DOM fully loaded and parsed");
+  wind = new RadialGauge({
+    renderTo: "wind",
+    value: 0,
+    minValue: 0,
+    maxValue: 360,
+    majorTicks: ["N"],
+    minorTicks: 22,
+    ticksAngle: 360,
+    startAngle: 180,
+    strokeTicks: false,
+    highlights: getHighlights(),
+    highlightsWidth: 70,
+    highlightsLineCap: "butt",
+    colorPlate: "rgba(255, 255, 255, 1)",
+    colorMajorTicks: "rgba(255, 0, 0, 0)",
+    colorMinorTicks: "rgba(0, 132, 255, .7)",
+    colorNumbers: "rgba(255, 255, 255, 0)",
+    colorNeedle: "rgba(255, 255, 255, 1)",
+    colorNeedleEnd: "rgba(255, 255, 255, 1)",
+    colorBorderMiddle: "rgba(255, 255, 255, 1)",
+    colorBorderInner: "rgba(255, 255, 255, 1)",
+    valueBox: false,
+    valueTextShadow: false,
+    colorCircleInner: "rgb(49, 121, 255)",
+    colorNeedleCircleOuter: "rgb(49, 121, 255)",
+    needleCircleSize: 15,
+    needleCircleOuter: true,
+    animationRule: "linear",
+    needleType: "arrow",
+    needleStart: 0,
+    needleEnd: 0,
+    needleWidth: 0,
+    borders: true,
+    borderInnerWidth: 5,
+    borderMiddleWidth: 5,
+    borderOuterWidth: 10,
+    colorNeedleShadowUp: "rgba(0, 0, 0, 0)",
+    colorNeedleShadowDown: "rgba(0, 0, 0, 0)",
+    borderShadowWidth: 0,
+    animationTarget: "plate",
+    units: "ᵍ",
+    fontTitleSize: 19,
+    colorTitle: "#f5f5f5",
+    animationDuration: 400,
+    valueBox: true,
+  }).draw();
+  // compass = new RadialGauge({
+  //   renderTo: "bar",
+  //   value: 30,
+  //   minValue: 0,
+  //   maxValue: 360,
+  //   majorTicks: ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"],
+  //   highlights: [],
+  //   minorTicks: 0,
+  //   ticksAngle: 360,
+  //   strokeTicks: true,
+  //   startAngle: 180,
+  //   colorPlate: "rgba(0, 0, 0, 0)",
+  //   colorMajorTicks: "rgba(255, 0, 0, .3)",
+  //   colorMinorTicks: "rgba(0, 132, 255, .7)",
+  //   colorNumbers: "rgba(255, 255, 255, 1)",
+  //   colorNeedle: "rgba(255, 255, 255, 1)",
+  //   colorNeedleEnd: "rgba(255, 255, 255, 1)",
+  //   colorBorderMiddle: "rgba(255, 255, 255, 1)",
+  //   colorBorderInner: "rgba(255, 255, 255, 1)",
+  //   valueBox: false,
+  //   valueTextShadow: false,
+  //   colorCircleInner: "rgb(49, 121, 255)",
+  //   colorNeedleCircleOuter: "rgb(49, 121, 255)",
+  //   needleCircleSize: 15,
+  //   needleCircleOuter: true,
+  //   animationRule: "linear",
+  //   needleType: "arrow",
+  //   needleStart: 50,
+  //   needleEnd: 85,
+  //   needleWidth: 3,
+  //   borders: true,
+  //   borderInnerWidth: 5,
+  //   borderMiddleWidth: 5,
+  //   borderOuterWidth: 10,
+  //   colorNeedleShadowUp: "rgba(0, 0, 0, 0)",
+  //   colorNeedleShadowDown: "rgba(0, 0, 0, 0)",
+  //   borderShadowWidth: 0,
+  //   animationTarget: "needle",
+  //   units: "ᵍ",
+  //   title: "DIRECTION",
+  //   fontTitleSize: 19,
+  //   colorTitle: "#f5f5f5",
+  //   animationDuration: 500,
+  // }).draw();
+  boost = new LinearGauge({
+    renderTo: "bar",
+    width: 400,
+    height: 150,
+    units: "°C",
+    title: "Temperature",
+    minValue: -50,
+    maxValue: 50,
+    majorTicks: [-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50],
+    minorTicks: 5,
+    strokeTicks: true,
+    ticksWidth: 15,
+    ticksWidthMinor: 7.5,
+    highlights: [
+      {
+        from: -50,
+        to: 0,
+        color: "rgba(0,0, 255, .3)",
+      },
+      {
+        from: 0,
+        to: 50,
+        color: "rgba(255, 0, 0, .3)",
+      },
+    ],
+    colorMajorTicks: "#ffe66a",
+    colorMinorTicks: "#ffe66a",
+    colorTitle: "#eee",
+    colorUnits: "#ccc",
+    colorNumbers: "#eee",
+    colorPlate: "#2465c0",
+    colorPlateEnd: "#327ac0",
+    borderShadowWidth: 0,
+    borders: false,
+    borderRadius: 10,
+    needleType: "arrow",
+    needleWidth: 3,
+    animationDuration: 1500,
+    animationRule: "linear",
+    colorNeedle: "#222",
+    colorNeedleEnd: "",
+    colorBarProgress: "#327ac0",
+    colorBar: "#f5f5f5",
+    barStroke: 0,
+    barWidth: 8,
+    barBeginCircle: false,
+  }).draw();
+  gauge = new RadialGauge({
+    renderTo: "base",
+    colorPlate: "rgba(0, 0, 0, 0)",
+    colorNumbers: "rgba(255, 255, 255, 0)",
+    highlights: [],
+    valueBox: false,
+    value: 0,
+    minValue: 0,
+    maxValue: 360,
+    ticksAngle: 360,
+    startAngle: 180,
+    colorNeedle: "rgba(255, 255, 255, 1)",
+    colorNeedleShadowUp: "rgba(0, 0, 0, .1)",
+    colorNeedleShadowDown: "rgba(0, 0, 0, 1)",
+    colorNeedleEnd: "rgba(255, 255, 255, 1)",
+    needleType: "arrow",
+    needleStart: 40,
+    needleEnd: 60,
+    needleWidth: 15,
+    animationTarget: "plate",
+    units: "ᵍ",
+  }).draw();
+});
+
+var connector = window.setInterval(() => {
+  try {
+    connectWebSocket();
+    window.clearInterval(connector);
+  } catch (e) {
+    console.log("could not connect to server");
+    // console.error(e);
+    indicator.classList.add("connError");
+    connInfo.innerText = "not connected";
+  }
+}, 1000);
+
+if (connection) {
+  connection.onopen = function () {
+    // connection.send("GET_TEMP");
+    indicator.classList.add("connected");
+    connInfo.innerText = "connected";
+  };
+  console.log("connection opened");
+
+  connection.onerror = function (error) {
+    console.log("WebSocket Error ", error);
+    indicator.classList.add("connError");
+    connInfo.innerText = "error";
+  };
+
+  connection.onmessage = function (evt) {
+    // handle websocket message. update attributes or values of elements that match the name on incoming message
+    // console.log("msg rec", evt.data);
+    var msgArray = evt.data.split(","); // split message by delimiter into a string array
+    var indicator = msgArray[1]; // the first element in the message array is the ID of the object to update
+    // console.log("indiactor", indicator);
+    if (indicator) {
+      // if an object by the name of the message exists, update its value or its attributes
+      switch (msgArray[1]) {
+        case "Arduino":
+          // console.log("Arduino ran");
+          var A0 = msgArray[2];
+          // var dir = A0.toString();
+          if (lastVal !== A0) {
+            // wind.value = A0;
+            wind.update({ highlights: getHighlights(), value: A0 });
+            info.innerText = msgArray[4];
+          }
+          lastVal = A0 * 1;
+
+          break;
+
+        default:
+          // unrecognized message type. do nothing
+          break;
+      } // switch
+    }
+  };
+}
+
+function connectWebSocket() {
+  connection = new WebSocket("ws://" + location.hostname + ":81/", ["arduino"]);
+}

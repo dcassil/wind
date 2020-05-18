@@ -1,0 +1,13 @@
+{
+  "runOnSave.statusMessageTimeout": 3000,
+  "runOnSave.commands": [
+    {
+      "match": "\\Display_AP-JS/data_source/*.*",
+      "command": "gzip ${fileDirname}/**/*.* --output=/home/d/Dropbox/my_code/arduino/windserver/main/Display_AP-JS/data/",
+
+      "runIn": "backend",
+      "runningStatusMessage": "Compiling ${fileBasename}",
+      "finishStatusMessage": "${fileBasename} compiled"
+    }
+  ]
+}

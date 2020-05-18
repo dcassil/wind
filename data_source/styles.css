@@ -1,0 +1,156 @@
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.boost {
+  height: 50px;
+  width: 100%;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.boat {
+  transform: rotate(-90deg);
+  transform: rotate(-90deg) scale(0.5) translateX(13%);
+}
+
+.svgContainer {
+  display: flex;
+  align-items: center;
+  background-color: rgb(255, 255, 255);
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.compass {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  position: absolute;
+}
+
+.compass image {
+  width: 75%;
+  height: 100%;
+}
+
+.controlOverlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.button {
+  position: fixed;
+  left: 0px;
+  top: 80px;
+  width: 100%;
+  height: 100px;
+  border-radius: 50% 50% 0 0;
+}
+
+.info {
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  width: 200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.indicator {
+  /* background-color: black; */
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  -webkit-animation: status_starting_animation 1s infinite; /* Safari 4+ */
+  -moz-animation: status_starting_animation 1s infinite; /* Fx 5+ */
+  -o-animation: status_starting_animation 1s infinite; /* Opera 12+ */
+  animation: status_starting_animation 1s infinite; /* IE 10+, Fx 29+ */
+}
+
+.action {
+  width: 100%;
+  height: 100px;
+  display: flex;
+}
+
+.connection {
+  display: flex;
+  width: 100%;
+}
+
+.action input {
+  flex: 1 1 auto;
+  height: 100%;
+  width: 50%;
+}
+
+.indicator.connecting {
+  -webkit-animation: status_connecting_animation 1s infinite; /* Safari 4+ */
+  -moz-animation: status_connecting_animation 1s infinite; /* Fx 5+ */
+  -o-animation: status_connecting_animation 1s infinite; /* Opera 12+ */
+  animation: status_connecting_animation 1s infinite; /* IE 10+, Fx 29+ */
+}
+
+.indicator.connected {
+  background-color: greenyellow;
+}
+
+.indicator.connError {
+  /* background-color: red; */
+  -webkit-animation: status_error_animation 1s infinite; /* Safari 4+ */
+  -moz-animation: status_error_animation 1s infinite; /* Fx 5+ */
+  -o-animation: status_error_animation 1s infinite; /* Opera 12+ */
+  animation: status_error_animation 1s infinite; /* IE 10+, Fx 29+ */
+}
+
+@keyframes status_error_animation {
+  0%,
+  49% {
+    background-color: white;
+  }
+  50%,
+  100% {
+    background-color: #e50000;
+  }
+}
+
+@keyframes status_connecting_animation {
+  0%,
+  49% {
+    background-color: white;
+  }
+  50%,
+  100% {
+    background-color: #ffa600;
+  }
+}
+
+@keyframes status_starting_animation {
+  0%,
+  49% {
+    background-color: white;
+  }
+  50%,
+  100% {
+    background-color: #26ff00;
+  }
+}
