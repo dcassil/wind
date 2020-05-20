@@ -69,17 +69,17 @@ class Windicator {
     this.green = new Arc({
       ...options,
       ...this.segments.green,
-      color: "rgba(0, 255, 0, .5)",
+      color: "rgba(0, 255, 0, .8)",
     });
     this.red = new Arc({
       ...options,
       ...this.segments.red,
-      color: "rgba(255, 0, 0, .5)",
+      color: "rgba(255, 0, 0, .8)",
     });
     this.yellow = new Arc({
       ...options,
       ...this.segments.yellow,
-      color: "rgba(255, 255, 0, .5)",
+      color: "rgba(200, 200, 200, .8)",
     });
   }
   update(position) {
@@ -90,14 +90,14 @@ class Windicator {
   }
   _updateSegments(position) {
     this.segments = {
-      green: { position, size: 0.1 },
+      green: { position, size: 0.05 },
       red: {
-        position: this.reverse ? position + 0.08 : position - 0.08,
+        position: this.reverse ? position + 0.1 : position - 0.1,
         size: 0.1,
       },
       yellow: {
-        position: this.reverse ? position - 0.08 : position + 0.08,
-        size: 0.1,
+        position: this.reverse ? position - 0.1 : position + 0.05,
+        size: 0.05,
       },
     };
   }

@@ -9,34 +9,41 @@
 
   <body>
     <div class="container">
-      <div class="uiwrapper">
-        <div class="uirow" style="flex: 1 1 auto; height: 100%; width: 100%;">
-          <div id="port" class="uiquad"></div>
-          <div id="star" class="uiquad"></div>
-        </div>
-        <div class="uirow">
-          <div class="uiquad"></div>
-          <div class="uiquad">
-            <span class="info"
-              ><span id="connInfo" class="connection">starting...</span
-              ><span id="indicator" class="indicator connecting"></span
-              ><span id="info"></span
-            ></span>
+      <div id="np" class="notificationPanel">
+        <p id="npInfo">Collecting Data ( 5s remaning )</p>
+        <h3 id="npPrompt">Set port tack</h3>
+        <p id="npHelp">Head close hauled to port and hold</p>
+      </div>
+      <div class="compass_wrapper">
+        <div class="uiwrapper">
+          <div class="uirow" style="flex: 1 1 auto; height: 100%; width: 100%;">
+            <div id="set" class="uiquad"></div>
+            <div id="menu" class="uiquad"></div>
+          </div>
+          <div class="uirow">
+            <div id="back" class="uiquad"></div>
+            <div id="next" class="uiquad">
+              <span class="info"
+                ><span id="connInfo" class="connection">starting...</span
+                ><span id="indicator" class="indicator connecting"></span
+                ><span id="info"></span
+              ></span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div
-        id="svgContainer"
-        class="svgContainer"
-        style="margin: 5%; box-sizing: border-box;"
-      >
-        <object
-          id="compassObject"
-          class="compass"
-          type="image/svg+xml"
-          data="compass.svg"
-        ></object>
+        <div
+          id="svgContainer"
+          class="svgContainer"
+          style="margin: 5%; box-sizing: border-box;"
+        >
+          <object
+            id="compassObject"
+            class="compass"
+            type="image/svg+xml"
+            data="compass.svg"
+          ></object>
+        </div>
       </div>
       <span class="info"
         ><span id="connInfo" class="connection">starting...</span
@@ -44,6 +51,7 @@
         ><span id="info"></span
       ></span>
     </div>
+
     <script src="wsReconnect.js"></script>
     <script src="ui.js"></script>
     <script src="main.js"></script>

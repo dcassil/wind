@@ -6,20 +6,89 @@ var connection = connectWebSocket(),
   connInfo,
   info,
   ui,
-  portOffsetX = -1,
-  starOffset = -1,
+  portOffsetX,
+  starOffset,
   windDirection = 0,
   compassDirection = 0,
+  windwardPoint,
   windOffset = 0,
-  avg = [];
+  avg = [],
+  selectedMode = "default",
+  currentInstructions = [],
+  previousInstructions = [],
+  notificationPanel;
 
-document.getElementById("port").addEventListener("click", function (e) {
-  portOffsetX = windDirection;
-  console.log("port offset = " + portOffsetX);
+const INSTRUCT = {
+  START_RACE_SETUP: "startRaceSetup",
+  EXIT_RACE_MODE: "exitRaceMode",
+  SET_STAR: "setStar",
+  SET_PORT: "setPort",
+  SET_WINWARD: "setWinward",
+  SET_STARTLINE: "setStartLine",
+  RACE_SETUP_COMPLETE: "raceSetupComplete",
+  NONE: undefined,
+};
+
+const MODE = {
+  RACE: "race",
+  DEFAULT: "default",
+};
+document.getElementById("back").addEventListener("click", function (e) {
+  if (previousInstructions.length > 0) {
+    currentInstructions.unshift(previousInstructions.pop());
+    setNotificationPanel(currentInstructions[0]);
+  } else {
+    currentInstructions = [];
+    nextInstruction();
+  }
 });
-document.getElementById("star").addEventListener("click", function (e) {
-  starOffset = windDirection;
-  console.log("star offset = " + starOffset);
+document.getElementById("set").addEventListener("click", function (e) {
+  if (currentInstructions.length === 0) {
+    notificationPanel.root.classList.remove("open");
+    return;
+  }
+
+  switch (currentInstructions[0]) {
+    case INSTRUCT.SET_PORT:
+      portOffsetX = windDirection;
+      nextInstruction();
+      console.log("port offset = " + portOffsetX);
+
+      break;
+    case INSTRUCT.SET_STAR:
+      starOffset = windDirection;
+      nextInstruction();
+      console.log("star offset = " + starOffset);
+      break;
+    case INSTRUCT.SET_WINWARD:
+      windwardPoint = compassDirection;
+      nextInstruction();
+      break;
+    case INSTRUCT.SET_STARTLINE:
+      startLine = getStartLine();
+      nextInstruction();
+      break;
+    case INSTRUCT.RACE_SETUP_COMPLETE:
+      nextInstruction();
+      break;
+    case INSTRUCT.EXIT_RACE_MODE:
+      selectedMode = "default";
+      nextInstruction();
+    default:
+      break;
+  }
+});
+document.getElementById("menu").addEventListener("click", function (e) {
+  selectedMode = "race";
+  currentInstructions = [
+    INSTRUCT.SET_PORT,
+    INSTRUCT.SET_STAR,
+    INSTRUCT.SET_WINWARD,
+    INSTRUCT.SET_STARTLINE,
+  ];
+  console.log("starting race setup");
+  notificationPanel.root.classList.add("open");
+  setNotificationPanel(currentInstructions[0]);
 });
 window.addEventListener("resize", function () {
   console.log("resized");
@@ -29,24 +98,18 @@ connInfo = document.getElementById("connInfo");
 info = document.getElementById("info");
 
 document.addEventListener("DOMContentLoaded", function (event) {
+  notificationPanel = {
+    info: document.getElementById("npInfo"),
+    prompt: document.getElementById("npPrompt"),
+    help: document.getElementById("npHelp"),
+    root: document.getElementById("np"),
+  };
   ui = new UI({ targetId: "plate", parentId: "svgContainer" });
 
   compass = ui.getPlate("plate");
   ui.createWindicator("port", 15, true);
   ui.createWindicator("starboard", 0);
   ui.createBoostBar("boost");
-  //TEST CODE
-  // window.setInterval(() => {
-  //   if (windDirection > 360) {
-  //     windDirection = windDirection - 360;
-  //   }
-  //   windDirection += 10;
-  //   let percent = fromCompassToPercent(windDirection);
-  //   // ui.elements.plate.update(windDirection);
-  //   ui.elements.port.update(percent + 10);
-  //   ui.elements.starboard.update(percent * -1);
-  //   ui.elements.boost.update(percent - 30, "rgba(255, 0, 0, .8)");
-  // }, 100);
 });
 
 let disconnectWatcher,
@@ -146,4 +209,66 @@ function fromCompassToPercent(value) {
     return value - 360;
   }
   return value / 360;
+}
+
+function nextInstruction() {
+  previousInstructions.push(currentInstructions.shift());
+
+  if (currentInstructions.length > 0) {
+    notificationPanel.root.classList.add("open");
+  } else {
+    notificationPanel.root.classList.remove("open");
+    previousInstructions = [];
+  }
+
+  setNotificationPanel(currentInstructions[0]);
+}
+
+function setNotificationPanel(key) {
+  switch (key) {
+    case INSTRUCT.SET_PORT:
+      notificationPanel.info.innerText = "recording data";
+      notificationPanel.prompt.innerText = "Set Port Tack";
+      notificationPanel.help.innerText = "head close hauled to port";
+      break;
+    case INSTRUCT.SET_STAR:
+      notificationPanel.info.innerText = "recording data";
+      notificationPanel.prompt.innerText = "Set Starboard Tack";
+      notificationPanel.help.innerText = "head close hauled to starboard";
+      break;
+    case INSTRUCT.SET_WINWARD:
+      notificationPanel.info.innerText = "recording data";
+      notificationPanel.prompt.innerText = "Set Winward Line";
+      notificationPanel.help.innerText = "point directly at the winward mark";
+      break;
+    case INSTRUCT.SET_STARTLINE:
+      notificationPanel.info.innerText = "recording data";
+      notificationPanel.prompt.innerText = "Set Start Line";
+      notificationPanel.help.innerText = "run parallel to the start line";
+      break;
+    default:
+      if (currentInstructions.length === 0) {
+        notificationPanel.info.innerText = "";
+        notificationPanel.prompt.innerText =
+          MODE.RACE && isRaceSetup() ? "WIND - race active" : "WIND";
+        notificationPanel.help.innerText = "";
+      }
+      break;
+  }
+}
+
+function isRaceSetup() {
+  return (
+    windwardPoint !== undefined &&
+    startLine !== undefined &&
+    portOffsetX !== undefined &&
+    starOffset !== undefined
+  );
+}
+
+function getStartLine() {
+  // calculate start line by looking at current heading and winward point.
+  // startline will be a line running parallel to the boat
+  // with the winward point being loosely perpendicular
+  return 1;
 }
