@@ -88,10 +88,10 @@ connect().then((connection) => {
       wasDisconnected = true;
     }, 2000);
     var windReading = fromCompassToPercent(data.wind * 1);
-    var compassReading = fromCompassToPercent(data.deg * 1);
+    var compassReading = data.magDeg * 1;
     // var dir = windReading.toString();
 
-    info.innerText = data.lat + " ," + data.lng + " ," + data.deg;
+    info.innerText = data.lat + " ," + data.lng + " ," + data.magDeg;
     if (windDirection !== windReading) {
       avg.push(windReading);
       if (avg.length > 5) {

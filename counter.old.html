@@ -9,10 +9,22 @@
 
   <body>
     <div class="container">
-      <div class="uiwrapper">
+      <div
+        class="uiwrapper"
+        style="
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          display: flex;
+          flex-direction: column;
+          z-index: 9;
+        "
+      >
         <div class="uirow" style="flex: 1 1 auto; height: 100%; width: 100%;">
-          <div id="port" class="uiquad"></div>
-          <div id="star" class="uiquad"></div>
+          <div class="uiquad"></div>
+          <div class="uiquad"></div>
         </div>
         <div class="uirow">
           <div class="uiquad"></div>
@@ -31,12 +43,11 @@
         class="svgContainer"
         style="margin: 5%; box-sizing: border-box;"
       >
-        <object
-          id="compassObject"
-          class="compass"
-          type="image/svg+xml"
-          data="compass.svg"
-        ></object>
+        <svg>
+          <use xlink:href="compass/root.svg"></use>
+        </svg>
+
+        <object type="image/svg+xml" data="compass/root.svg"></object>
       </div>
       <span class="info"
         ><span id="connInfo" class="connection">starting...</span

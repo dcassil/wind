@@ -3,6 +3,7 @@ class UI {
     this.elements = {};
     this.target = document.getElementById(options.targetId);
     this.parent = document.getElementById(options.parentId);
+    this.document = document.getElementById("compassObject").contentDocument;
   }
   createArc(id, size, position, color) {
     this.arcPlate = this.arcPlate || new ArcPlate({ parent: this.parent }).ele;
@@ -26,7 +27,8 @@ class UI {
   }
   getPlate(id) {
     this.elements[id] = new Plate({
-      ele: document.getElementById("compass_g"),
+      document: this.document,
+      ele: this.document.getElementById("compassPlate"),
     });
     return this.elements[id];
   }
@@ -157,6 +159,7 @@ class Arc {
 
 class Plate {
   constructor(options) {
+    this.document = options.document;
     this.color = options.color || "white";
     this.ele = options.ele;
   }
